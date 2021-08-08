@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  app:
+    image: phinixhq/tron-fullnode-exporter
+    restart: unless-stopped
+    environment: 
+      REFRESH_INTERVAL_MILLISECONDS: "30000"
+      TRONSCAN_BASE_URL:
+      TRON_FULLNODE_BASE_URL:
+      TRON_QUERY_SERVICE_BASE_URL:
+    ports:
+      - "9099:9099"
