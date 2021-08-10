@@ -21,7 +21,7 @@ const fullnodeLastUpdateGauge = new client.Gauge({ name: 'tron_fullnode_last_upd
 const queryServiceUpGauge = new client.Gauge({ name: 'tron_query_service_up', help: 'if queryService is accessible' });
 const queryServiceCurrentBlockGauge = new client.Gauge({ name: 'tron_query_service_current_block', help: 'number of current block' });
 const queryServiceLastUpdateGauge = new client.Gauge({ name: 'tron_query_service_last_update_seconds', help: 'number of latest block' });
-
+const queryServiceEarliestBlockGauge = new client.Gauge({ name: 'tron_query_service_earliest_block', help: 'number of earliest block' });
 
 // get the latest tronScan block number
 async function updateTronScanMetrics(){
@@ -54,10 +54,12 @@ async function updateTronFullNodeMetrics(){
 // get the latest tronQueryService block number
 async function updateTronQueryServiceMetrics(){
     try{
-    const tronQueryServiceLatestBlock = await axios.get(tronQueryServiceUrl);
+    const tronQueryServiceLatestBlock = await axios.get(`${tronQueryServiceUrl}/blocks/latestSolidifiedBlockNumber`);
+    const tronQueryServiceEarliestBlock = await axios.get(`${tronQueryServiceUrl}/blocks` , {params: {limit : 1 , sort : 'timeStamp'}});
     queryServiceUpGauge.set(1);
     queryServiceCurrentBlockGauge.set(tronQueryServiceLatestBlock.data);
     queryServiceLastUpdateGauge.set(Math.floor(Date.now() / 1000));
+    queryServiceEarliestBlockGauge.set(tronQueryServiceEarliestBlock.data.data[0].blockNumber);
     }
     catch(err){
         console.log(err);
