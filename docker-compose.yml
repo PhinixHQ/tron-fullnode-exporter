@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     environment: 
       REFRESH_INTERVAL_MILLISECONDS: "30000"
+      AXIOS_TIMEOUT:
       TRONSCAN_BASE_URL:
       TRON_FULLNODE_BASE_URL:
       TRON_QUERY_SERVICE_BASE_URL:

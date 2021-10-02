@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const client = require('prom-client');
-
+axios.defaults.timeout = parseInt(process.env.AXIOS_TIMEOUT);
 // URLs
 
 const tronScanApiUrl = process.env.TRONSCAN_BASE_URL
