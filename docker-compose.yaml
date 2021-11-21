@@ -8,6 +8,5 @@ services:
       AXIOS_TIMEOUT:
       TRONSCAN_BASE_URL:
       TRON_FULLNODE_BASE_URL:
-      TRON_QUERY_SERVICE_BASE_URL:
     ports:
       - "9099:9099"
