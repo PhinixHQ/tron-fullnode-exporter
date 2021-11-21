@@ -47,7 +47,7 @@ async function updateTronFullNodeMetrics(){
     }
     catch(err){
         console.log(err);
-        tronscanUpGauge.set(0);
+        fullnodeUpGauge.set(0);
     }
 }
 
@@ -63,7 +63,7 @@ async function updateTronQueryServiceMetrics(){
     }
     catch(err){
         console.log(err);
-        tronscanUpGauge.set(0);
+        queryServiceUpGauge.set(0);
     }
 }
 
