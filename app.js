@@ -4,6 +4,14 @@ const app = express();
 require('dotenv').config();
 const client = require('prom-client');
 axios.defaults.timeout = parseInt(process.env.AXIOS_TIMEOUT);
+const Sentry = require('@sentry/node');
+
+// Sentry
+Sentry.init({ dsn: process.env.SENTRY_DSN });
+Sentry.configureScope(scope => {
+    scope.setTag('coin', process.env.COIN_NAME);
+    scope.setTag('scope', process.env.SCOPE);
+  });
 // URLs
 
 const tronScanApiUrl = process.env.TRONSCAN_BASE_URL
@@ -27,6 +35,7 @@ async function updateTronScanMetrics(){
         tronscanLastUpdateGauge.set(Math.floor(Date.now() / 1000));
     }
     catch(err) {
+        Sentry.captureException(err);
         console.log(err);
         tronscanUpGauge.set(0);
     }
@@ -41,10 +50,30 @@ async function updateTronFullNodeMetrics(){
         fullnodeLastUpdateGauge.set(Math.floor(Date.now() / 1000));
     }
     catch(err){
+        Sentry.captureException(err);
         console.log(err);
         fullnodeUpGauge.set(0);
     }
 }
+
+// get the latest tronQueryService block number
+async function updateTronQueryServiceMetrics(){
+    try{
+    const tronQueryServiceLatestBlock = await axios.get(`${tronQueryServiceUrl}/blocks/latestSolidifiedBlockNumber`);
+    const tronQueryServiceEarliestBlock = await axios.get(`${tronQueryServiceUrl}/blocks` , {params: {limit : 1 , sort : 'timeStamp'}});
+    queryServiceUpGauge.set(1);
+    queryServiceCurrentBlockGauge.set(tronQueryServiceLatestBlock.data);
+    queryServiceLastUpdateGauge.set(Math.floor(Date.now() / 1000));
+    queryServiceEarliestBlockGauge.set(tronQueryServiceEarliestBlock.data.data[0].blockNumber);
+    }
+    catch(err){
+        Sentry.captureException(err);
+        console.log(err);
+        tronscanUpGauge.set(0);
+    }
+}
+
+
 
 // metrics endpoint for prometheus
 app.get('/metrics', async (req, res) => {
